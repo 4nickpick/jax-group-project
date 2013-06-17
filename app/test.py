@@ -7,7 +7,7 @@ from core.animation import Animation
 from app.animation import RectFrame
 from app.animation import AnimatedSprite
 
-from core.utils.pytmx import tmxloader
+from contrib.pytmx import tmxloader
 
 pygame.init()
 
