@@ -7,6 +7,7 @@ from core.animation import Animation
 from app.animation import RectFrame
 from app.animation import AnimatedSprite
 
+from core.utils.pytmx import tmxloader
 
 pygame.init()
 
@@ -16,6 +17,17 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
+screen_w = 640
+screen_h = 480
+screen_size = (screen_w, screen_h)
+
+tile_w = 32
+tile_h = 32
+tile_size = (tile_w, tile_h)
+
+grid_w = screen_w / tile_w
+grid_h = screen_h / tile_h
+grid_size = (grid_w, grid_h)
 
 class Dude(AnimatedSprite):
 
@@ -34,8 +46,23 @@ class Dude(AnimatedSprite):
         ),
       ]
     )
+    
+class Level():
 
-window_surface = pygame.display.set_mode((640, 480), 0, 32)
+  def __init__(self):
+    self.map_file = "desert.tmx" 
+    self.map_data = tmxloader.load_pygame(os.path.join("data", "maps", self.map_file))
+        
+  def draw(self,screen):
+    #test out the tmx format - draws 3 layers of tmx
+      for layer in range (0,3):
+        for x in range(0,grid_w):
+          for y in range(0,grid_h):
+            image = self.map_data.getTileImage(x, y, layer)
+            if image != 0:
+              screen.blit(image, (x*tile_w,y*tile_h))
+
+window_surface = pygame.display.set_mode(screen_size, 0, 32) #abstracted screen size
 window_surface.fill(WHITE)
 pygame.display.set_caption('Jax group game')
 pygame.display.update()
@@ -43,6 +70,7 @@ pygame.display.flip()
 clock = pygame.time.Clock()
 
 dude = Dude()
+level = Level() #not a sprite per se, so not added to all_sprites
 all_sprites = pygame.sprite.RenderPlain((dude,))
 
 while True:
@@ -56,5 +84,6 @@ while True:
   all_sprites.update(clock.get_time())
 
   window_surface.fill(WHITE)
+  level.draw(window_surface)
   all_sprites.draw(window_surface)
   pygame.display.flip()
