@@ -50,7 +50,7 @@ class Dude(AnimatedSprite):
 class Level():
 
   def __init__(self):
-    self.map_file = "desert.tmx" 
+    self.map_file = "test_map.tmx" 
     self.map_data = tmxloader.load_pygame(os.path.join("data", "maps", self.map_file))
         
   def draw(self,screen):
