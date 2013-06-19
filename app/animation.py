@@ -41,7 +41,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
 
   def update(self, delta):
     """
-    Note: 
+    Note:
       self._image is a reference kept to get subsurfaces
       May want to cache subsurfaces in the future if it's too slow
     """
