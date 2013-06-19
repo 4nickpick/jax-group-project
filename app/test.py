@@ -1,7 +1,6 @@
 import pygame, sys, os
 from pygame.locals import *
 
-from core.animation import AnimationManager
 from core.animation import Animation
 
 from app.animation import RectFrame
