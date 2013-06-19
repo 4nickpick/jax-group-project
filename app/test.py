@@ -60,6 +60,7 @@ class Level():
           for y in range(0,grid_h):
             image = self.map_data.getTileImage(x, y, layer)
             if image != 0:
+              image.set_colorkey((0, 0, 0));
               screen.blit(image, (x*tile_w,y*tile_h))
 
 window_surface = pygame.display.set_mode(screen_size, 0, 32) #abstracted screen size
