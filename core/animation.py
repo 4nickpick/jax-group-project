@@ -1,8 +1,8 @@
 """
 Animation base classes
-
-@author Stephen Pridham
 """
+
+__author__ = "Stephen Pridham"
 
 
 class Frame(object):
@@ -27,13 +27,23 @@ class Animation(object):
   """
   Container class for a single animation.
   This class calls the callbacks for the frames.
+
+  Usage:
+  >> animation = Animation(
+  >>  'animation_name',
+  >>  [Frame(...), Frame(...)],
+  >>  total_time=110
+  >> )
   """
   delta = 0
 
-  def __init__(self, name, frames, current_frame=0):
+  def __init__(self, name, frames, total_time=None, current_frame=0):
     self.name = name
     self.frames = frames
     self.current_frame = current_frame
+    if total_time is not None:
+      for frame in self.frames:
+        frame.total_time = total_time
 
   def get_next_frame(self, delta):
     if not self.frames:
@@ -53,7 +63,7 @@ class Animation(object):
 
   def get_frame_at(self, index):
     try:
-      return self.frame[index]
+      return self.frames[index]
     except IndexError:
       raise IndexError("Animation frame chosen out of index")
 
@@ -129,8 +139,8 @@ class AnimationManager(object):
 
     return current_animation
 
-  def get_frame_at(self, index):
-    return self.get_animation().get_frame_at(index)
+  def get_frame_at(self, index, animation=None):
+    return self.get_animation(animation).get_frame_at(index)
 
   def set_frame_at(self, index):
     self.get_animation().set_frame_at(index)
@@ -144,8 +154,9 @@ class AnimationManager(object):
         "The animation %s is not available for %r" %
         (animation_name, self.__repr__())
       )
+    if self.current_animation != animation_name:
+      self.restart()
     self.current_animation = animation_name
-    self.reset()
 
   def set_animations(self, animations):
     """
@@ -168,5 +179,5 @@ class AnimationManager(object):
     del self.animations[animation]
     return animation
 
-  def reset(self, animation_name=None):
-    self.get_animation(animation_name).reset()
+  def restart(self, animation_name=None):
+    self.get_animation(animation_name).restart()
