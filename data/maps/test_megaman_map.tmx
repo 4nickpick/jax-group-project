@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="40" height="30" tilewidth="16" tileheight="16">
+ <tileset firstgid="1" name="megaman_ending" tilewidth="16" tileheight="16">
+  <image source="mm1endingtiles.gif" width="154" height="372"/>
+ </tileset>
+ <objectgroup name="objects" width="40" height="30">
+  <object x="243" y="181">
+   <polyline points="0,0 29,-39 52,-22 52,24 9,36 77,52 91,11 73,-16 93,-45"/>
+  </object>
+  <object x="483" y="148" width="118" height="70"/>
+ </objectgroup>
+ <layer name="Tile Layer 1" width="40" height="30">
+  <data encoding="base64" compression="zlib">
+   eJzt19ENABAMANHuP4dBrYCjRe4l/kTOl2oR0S5ft7KPsY+xj7GPsY9Z7ct6K2fPzH7LR86snDUqZ6Gq+57Yu4t9jH2MfcwLfT/8a6VXdFHwYqk=
+  </data>
+ </layer>
+</map>
