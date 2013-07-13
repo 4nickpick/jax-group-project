@@ -1,8 +1,9 @@
 """
 Animation base classes
-
-@author Stephen Pridham
 """
+
+__author__ = "Stephen Pridham"
+
 
 class Frame(object):
   """
@@ -13,9 +14,9 @@ class Frame(object):
   is longer than others for some reason or another.
 
   Usage:
-  >>> def play_footstep(delta):
-  >>>   sound_manager.play("metal_footstep.wav")
-  >>> Frame(..., callbacks=[play_footstep])
+  >> def play_footstep(delta):
+  >>   sound_manager.play("metal_footstep.wav")
+  >> Frame(..., callbacks=[play_footstep])
   """
   def __init__(self, total_time=0.5, callbacks=None):
     self.total_time = total_time
@@ -26,13 +27,23 @@ class Animation(object):
   """
   Container class for a single animation.
   This class calls the callbacks for the frames.
+
+  Usage:
+  >> animation = Animation(
+  >>  'animation_name',
+  >>  [Frame(...), Frame(...)],
+  >>  total_time=110
+  >> )
   """
   delta = 0
 
-  def __init__(self, name, frames, current_frame=0):
+  def __init__(self, name, frames, total_time=None, current_frame=0):
     self.name = name
     self.frames = frames
     self.current_frame = current_frame
+    if total_time is not None:
+      for frame in self.frames:
+        frame.total_time = total_time
 
   def get_next_frame(self, delta):
     if not self.frames:
@@ -52,7 +63,7 @@ class Animation(object):
 
   def get_frame_at(self, index):
     try:
-      return self.frame[index]
+      return self.frames[index]
     except IndexError:
       raise IndexError("Animation frame chosen out of index")
 
@@ -69,28 +80,28 @@ class AnimationManager(object):
   Manager class for a number of animations.
 
   Usage:
-  >>> manager = AnimationManager()
-  >>> manager.set_animations([
-  >>>   Animation(
-  >>>    'walk_right',
-  >>>    [Frame(...), Frame(...), Frame(...)]
-  >>>  )
-  >>>   Animation(
-  >>>    'walk_left',
-  >>>    [Frame(...), Frame(...), Frame(...)]
-  >>>   )
-  >>> ])
+  >> manager = AnimationManager()
+  >> manager.set_animations([
+  >>   Animation(
+  >>    'walk_right',
+  >>    [Frame(...), Frame(...), Frame(...)]
+  >>  )
+  >>   Animation(
+  >>    'walk_left',
+  >>    [Frame(...), Frame(...), Frame(...)]
+  >>   )
+  >> ])
 
   To set next frame in animation:
-  >>> image = spritesheet.subsurface(
-  >>>  manager.get_next_frame(delta_milliseconds)
-  >>> )
+  >> image = spritesheet.subsurface(
+  >>  manager.get_next_frame(delta_milliseconds)
+  >> )
   """
   current_animation = None
   animations = {}
 
   def __init__(self, animations=[]):
-    self.set_animations(animations) 
+    self.set_animations(animations)
 
     for a in self.animations.iteritems():
       if not isinstance(a[1], Animation):
@@ -122,12 +133,14 @@ class AnimationManager(object):
     elif self.current_animation in self.animations:
       current_animation = self.animations[self.current_animation]
     else:
-      raise KeyError("Invalid animation for %r" % self.__repr__())
+      raise KeyError("Invalid animation %s for %r" % (
+          animation, self.__repr__())
+      )
 
     return current_animation
 
-  def get_frame_at(self, index):
-    return self.get_animation().get_frame_at(index)
+  def get_frame_at(self, index, animation=None):
+    return self.get_animation(animation).get_frame_at(index)
 
   def set_frame_at(self, index):
     self.get_animation().set_frame_at(index)
@@ -138,11 +151,12 @@ class AnimationManager(object):
     """
     if animation_name not in self.animations:
       raise KeyError(
-        "The animation %s is not available for %r" % 
+        "The animation %s is not available for %r" %
         (animation_name, self.__repr__())
       )
+    if self.current_animation != animation_name:
+      self.restart()
     self.current_animation = animation_name
-    self.reset()
 
   def set_animations(self, animations):
     """
@@ -165,5 +179,5 @@ class AnimationManager(object):
     del self.animations[animation]
     return animation
 
-  def reset(self, animation_name=None):
-    self.get_animation(animation_name).reset()
+  def restart(self, animation_name=None):
+    self.get_animation(animation_name).restart()
