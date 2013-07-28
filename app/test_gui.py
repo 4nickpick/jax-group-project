@@ -4,7 +4,7 @@ from pygame import locals
 
 
 from app.level import Level
-from app.level import Context
+from app.imgui import PygameUIContext
 from app.enemy import Enemy
 
 from app.renderer import *
@@ -18,7 +18,7 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
 window_surface = pygame.display.set_mode(SCREEN_SIZE, 0, 32)
-ui_context = Context(window_surface)
+ui_context = PygameUIContext(window_surface)
 pygame.display.update()
 pygame.display.flip()
 clock = pygame.time.Clock()
@@ -46,10 +46,11 @@ while True:
   level.draw(window_surface)
 
   ui_context.prepare()
-  if ui_context.button('button_1', 0, 0, text="Press me!"):
-    print 'You pressed the button!'
-  if ui_context.text_field('text_field', 85, 0):
-    print 'You entered a character!'
+  if ui_context.button('button_1', 0, 0, text="Quit"):
+    pygame.quit()
+    sys.exit()
+  if ui_context.text_field('text_field', rect=(85, 0, 100, 30)):
+    pass
   ui_context.finish()
 
   pygame.display.flip()

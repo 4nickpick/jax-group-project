@@ -1,156 +1,72 @@
+"""
+Immediate Mode Graphics User Interface
+A declaritive, top down approach to user interfaces
 
-class Singleton(type):
-  """
-  We only want one instance of a singleton
-  """
-  _instances = {}
-
-  def __call__(cls, *args, **kwargs):
-    if cls not in cls._instances:
-      cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-    return cls._instances[cls]
+Usage:
+  >>> class MyContext(UIContext):
+  >>>   # implement methods
+  >>>   pass
+  >>> ui_context = MyContext(window_surface)
+  >>> ui_context.prepare()
+  >>> if ui_context.button('button_1', 0, 0, text="Quit"):
+  >>>   window.exit()
+  >>> if ui_context.text_field('text_field', rect=(85, 0, 100, 30)):
+  >>>   do_something_else_on_text_change()
+  >>> ui_context.finish()
+"""
 
 
 class UIContext(object):
   """
-  The interface state
+  Base class for UI context
   """
-  __metaclass__ = Singleton
 
-  mouse_x = 0
-  mouse_y = 0
-  mouse_down = False
+  hot_item = None
+  active_item = None
+  keyboard_item = None
+  key_down = None
+  key_char = None
+  text = {}
+  surface = None
 
-  hot_item = 0
-  active_item = 0
-
-  keyboard_item = 0
-  keyboard_focus = 0
-  key_entered = 0
-  key_mod = 0
-  key_char = 0
-
-  last_widget = 0
-
-  def __init__(self, renderer):
-    self.renderer = renderer
+  def __init__(self, surface):
+    self.surface = surface
 
   def prepare(self):
-    """
-    Prepare GUI
-    """
-    self.hot_item = 0
+    self.hot_item = None
 
   def finish(self):
-    """
-    Finish GUI
-    """
-    if not self.mouse_down:
-      self.active_item = 0
-    elif self.active_item == 0:
+    if not self.get_mouse_press():
+      self.active_item = None
+    elif self.active_item is None:
       self.active_item = -1
 
-    if self.key_entered == 'TAB':
-      self.keyboard_item = 0
+    if self.get_tab_press():
+      self.keyboard_item = None
 
-    self.key_entered = 0
-    self.key_char = 0
+    self.key_down = None
+    self.key_char = None
 
-  def region_hit(self, x, y, width, height):
-    hit = True
-    if (self.mouse_x < x or
-        self.mouse_y < y or
-        self.mouse_x >= x + width or
-       self.mouse_y >= y + height):
-      hit = False
-    return hit
+  def is_hot(self, unique_id):
+    return self.hot_item == unique_id
 
-  def event_poll(self, event):
-    """
-    Go through events
-    """
+  def is_active(self, unique_id):
+    return self.active_item == unique_id
+
+  def has_keyboard_focus(self, unique_id):
+    return self.keyboard_item == unique_id
+
+  def check_and_set_hotness(self, unique_id, rect):
     raise NotImplementedError
 
-  def key_pressed(self, key):
-    """
-    Return whether the user pressed the key
-    """
+  def check_and_set_keyboard_focus(self, unique_id):
     raise NotImplementedError
 
-
-class UIRenderer(object):
-
-  def draw_rect(self, x, y, width, height, color):
-    """
-    """
+  def pressed_widget(self, unique_id):
     raise NotImplementedError
 
-  def draw_line(self):
-    """
-    """
+  def get_mouse_press(self):
     raise NotImplementedError
 
-  def draw_char(self):
-    """
-    """
+  def get_tab_press(self):
     raise NotImplementedError
-
-  def draw_string(self):
-    """
-    """
-    raise NotImplementedError
-
-
-def button(context, ui_id, x, y, text=None):
-  """
-  Render a button, return true on press, else false
-  """
-  height = 24
-  width = 64
-
-  if context.region_hit(x, y, width, height):
-    context.hot_item = ui_id
-    if context.active_item == 0 and context.mouse_down:
-      context.active_item = ui_id
-
-  if context.keyboard_item == 0:
-    context.keyboard_item = ui_id
-
-  if context.keyboard_item == ui_id:
-    context.renderer.draw_rect(
-      x - 6, y - 6, width + 20, height + 20, '0xff00ff'
-    )
-
-  context.renderer.draw_rect(x + 8, y + 8, width, height, '0x000000')
-
-  if context.hot_item == ui_id:
-    if context.active_item == ui_id:
-      context.renderer.draw_rect(x + 2, y + 2, width, height, '0xffffff')
-    else:
-      context.renderer.draw_rect(x, y, width, height, '0xffffff')
-  else:
-    context.renderer.draw_rect(x, y, width, height, '0xaaaaaa')
-
-  if text:
-    context.draw_string(text, x + len(text), y + height / 4)
-
-  if context.keyboard_item == ui_id:
-    if context.key_pressed('TAB'):
-      context.keyboard_item = 0
-
-      if 'SHIFT' in context.key_mod:
-        context.keyboard_item = context.last_widget
-
-      context.key_entered = 0
-
-    if context.key_pressed('RETURN'):
-      return True
-
-  context.last_widget = ui_id
-
-  if (context.mouse_down and
-      context.hot_item == ui_id and
-     context.active_item == ui_id):
-    return True
-
-  return False
